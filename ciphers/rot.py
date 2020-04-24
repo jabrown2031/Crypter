@@ -1,21 +1,64 @@
 # Rotation cipher
 # rot 13 and ceaser
-# uses UTF-8 or UTF-16 charater sets
+# uses UTF-16 charater sets
 
-import binascii
-
+## encrypt text with a shift of key
+## generate a HEX string
 def encrypt(plaintext, key):
-    ciphertext = b'';
-    shift=0;
-    
-    for i in range(len(plaintext)):
-        if ((ord(plaintext[i]) + key) <= 65535):
-            ciphertext += binascii.unhexlify(hex(ord(plaintext[i]) + key).strip('0x').encode());
-        else:
-            ciphertext += binascii.unhexlify(hex(ord(plaintext[i]) + (65535 - key).strip('0x').encode());
+    ciphertext = "";
+    c = 0;
 
+    for i in range(len(plaintext)):
+        c = ord(plaintext[i]) + key;
+
+        # if shift is at edge of char space
+        # start at 0
+        # if shift is negative
+        # start at 65536
+        if (c >= 65536):
+            c = c - 65536;
+        elif (c < 0):
+            c = c + 65536;
+
+        ciphertext += hex(c);
 
     return ciphertext;
 
+## decrypt text with a shift of key
+## generate a CHAR string
 def decrypt(ciphertext, key):
+    plaintext = "";
+    c = 0;
+
+    for i in range(1, len(ciphertext.split('0x'))):
+        c = int(ciphertext.split('0x')[i], 16) - key;
+
+        # if shift is at edge of char space
+        # start at 0
+        # if shift is negative
+        # start at 65536
+        if (c >= 65536):
+            c = c - 65536;
+        elif (c < 0):
+            c = c + 65536;
+
+        plaintext += chr(c);
+
+    return plaintext;
+
+### TEST ###
+
+import random
+
+text = "TeSt"
+print("Text:",text)
+
+key = random.randrange(65536);
+print("Key:", key)
+
+ctext = encrypt(text, key);
+print("CipherText:", ctext);
+
+ptext = decrypt(ctext, key);
+print("PlainText:", ptext);
 
